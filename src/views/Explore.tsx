@@ -23,6 +23,7 @@ import { PromptTemplateService, PromptTemplateTypeEnum } from '../services/Promp
 import { Logger } from '../utils/Logger';
 import { EmbedContainer } from './EmbedContainer';
 import './../assets/style.css';
+import { marked } from 'marked';
 /**
  * Looker GenAI - Explore Component
  */
@@ -42,7 +43,7 @@ export const Explore: React.FC = () => {
   const [currentFields, setCurrentFields] = useState<FieldMetadata[]>();
   const [currentExploreData, setCurrentExploreData] = useState<LookerExploreDataModel>();
   const [generativeExploreService, setGenerativeExploreService] = useState<ExploreService>();
-
+  const [fhtml, setFhtml] = useState<string>("")
 
   useEffect(() => {
     loadExplores();
@@ -114,6 +115,7 @@ export const Explore: React.FC = () => {
       }
     }
     setLlmInsights("");
+    setFhtml("");
   }
 
 
@@ -213,6 +215,8 @@ export const Explore: React.FC = () => {
       {
         const insight = await generativeExploreService.answerQuestionWithData(prompt, exploreQuery.queryId);
         setLlmInsights(insight);
+        const f_fhtml = await marked.parse(insight)
+        setFhtml(f_fhtml)
       }
       catch(error: any) {
         const errorMessage: string = error?.message || "unknown error message";
@@ -269,12 +273,7 @@ export const Explore: React.FC = () => {
               <IconButton icon={<Icons.ThumbDown/>}  label="Down" onClick={handleThumbsDown}/>
             </Space>
             <SpaceVertical stretch>
-              <TextArea
-                className="prompt-input-area"
-                placeholder="[Experimental] LLM Text Answer"
-                value={llmInsights}
-                readOnly
-              />
+              <div dangerouslySetInnerHTML={{ __html: fhtml }}></div> 
               </SpaceVertical>
             <Dialog isOpen={loadingLLM}>
               <DialogLayout header="Loading LLM Data to Explore...">

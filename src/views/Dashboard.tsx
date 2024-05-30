@@ -172,13 +172,13 @@ export const Dashboard: React.FC = () => {
       const f_fhtml = await marked.parse(promptResult)
       setFhtml(f_fhtml)
       
-      console.log("showing f_fhtml");
-      console.log(f_fhtml);
+      //console.log("showing f_fhtml");
+      //console.log(f_fhtml);
       
-      console.log("showing llmInsights");
-      console.log(llmInsights);
-      console.log("showing fhtml");
-      console.log(fhtml);
+      //console.log("showing llmInsights");
+      //console.log(llmInsights);
+      //console.log("showing fhtml");
+      //console.log(fhtml);
       
     } catch (error: any) {
       const errorMessage: string = error?.message || "unknown error message";
