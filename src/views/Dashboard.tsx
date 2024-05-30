@@ -21,6 +21,8 @@ import { Logger } from '../utils/Logger'
 import { ConfigReader } from '../services/ConfigReader'
 import { StateContext } from '../context/settingsContext'
 import { StateContextType } from '../@types/settings'
+import { marked } from 'marked';
+
 
 /**
  * Ask a Question to a Dashboard using LLM Models
@@ -42,7 +44,9 @@ export const Dashboard: React.FC = () => {
   const [llmInsights, setLlmInsights] = useState<string>()
   const [dashboardDivElement, setDashboardDivElement] = useState<HTMLDivElement>()
   const [hostUrl, setHostUrl] = useState<string>()
-
+  const [fhtml, setFhtml] = useState<string>("")
+  
+  
   const defaultWelcomePrompt = "`Act as an experienced Business Data Analyst with PHD and answer the question having into";
   const defaultPromptValue = "Can you summarize the following datasets in 10 bullet points?";
 
@@ -126,6 +130,7 @@ export const Dashboard: React.FC = () => {
   const handleClear = () => {
     // Removes the first child
     setLlmInsights("");
+    setFhtml("");
   }
 
 
@@ -163,6 +168,18 @@ export const Dashboard: React.FC = () => {
       const promptResult = await generativeDashboardService.sendPrompt(dashboardElementsData, prompt, checkUseNativeBQ)
       // update interface with results
       setLlmInsights(promptResult)
+
+      const f_fhtml = await marked.parse(promptResult)
+      setFhtml(f_fhtml)
+      
+      console.log("showing f_fhtml");
+      console.log(f_fhtml);
+      
+      console.log("showing llmInsights");
+      console.log(llmInsights);
+      console.log("showing fhtml");
+      console.log(fhtml);
+      
     } catch (error: any) {
       const errorMessage: string = error?.message || "unknown error message";
       Logger.error('unable load dashboard insights', errorMessage);
@@ -204,12 +221,8 @@ export const Dashboard: React.FC = () => {
               </DialogLayout>
             </Dialog>            
              <SpaceVertical stretch>
-              <TextArea                        
-                placeholder="Insights from LLM Model"
-                value={llmInsights}
-                readOnly
-              />
-              </SpaceVertical>                      
+              <div dangerouslySetInnerHTML={{ __html: fhtml }}></div>
+            </SpaceVertical>                      
            </SpaceVertical>                                                                 
         <Space stretch>
           <EmbedContainer ref={embedCtrRef}>          
@@ -219,3 +232,4 @@ export const Dashboard: React.FC = () => {
     </ComponentsProvider>
   )
 }
+
